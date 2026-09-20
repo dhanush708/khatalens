@@ -1,0 +1,42 @@
+[
+  {
+    "customer": "Dr. Vinod Clinic",
+    "amount": 3400.0,
+    "date": "2026-09-05",
+    "type": "credit",
+    "confidence": 0.98,
+    "source_note": "Syringes, Cotton, Betadine"
+  },
+  {
+    "customer": "Meena Bai",
+    "amount": 280.0,
+    "date": "2026-09-08",
+    "type": "credit",
+    "confidence": 0.92,
+    "source_note": "BP tablets regular course"
+  },
+  {
+    "customer": "Dr. Vinod Clinic",
+    "amount": 2000.0,
+    "date": "2026-09-12",
+    "type": "payment",
+    "confidence": 0.96,
+    "source_note": "Cheque clearance credited"
+  },
+  {
+    "customer": "Gopal Das",
+    "amount": 550.0,
+    "date": "2026-09-14",
+    "type": "credit",
+    "confidence": 0.93,
+    "source_note": "Vitamins & Pain relief spray"
+  },
+  {
+    "customer": "Sunita Devi",
+    "amount": 410.0,
+    "date": "2026-09-19",
+    "type": "credit",
+    "confidence": 0.89,
+    "source_note": "Child fever syrup & thermometer"
+  }
+]

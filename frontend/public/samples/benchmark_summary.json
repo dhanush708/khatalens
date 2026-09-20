@@ -1,0 +1,79 @@
+{
+  "per_sample": {
+    "sample1": {
+      "total_ground_truth": 5,
+      "total_extracted": 5,
+      "matched_rows": 5,
+      "fully_correct_rows": 5,
+      "customer_accuracy": 1.0,
+      "amount_accuracy": 1.0,
+      "date_accuracy": 1.0,
+      "type_accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "sample2": {
+      "total_ground_truth": 5,
+      "total_extracted": 5,
+      "matched_rows": 5,
+      "fully_correct_rows": 5,
+      "customer_accuracy": 1.0,
+      "amount_accuracy": 1.0,
+      "date_accuracy": 1.0,
+      "type_accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "sample3": {
+      "total_ground_truth": 5,
+      "total_extracted": 5,
+      "matched_rows": 5,
+      "fully_correct_rows": 5,
+      "customer_accuracy": 1.0,
+      "amount_accuracy": 1.0,
+      "date_accuracy": 1.0,
+      "type_accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "sample4": {
+      "total_ground_truth": 5,
+      "total_extracted": 5,
+      "matched_rows": 5,
+      "fully_correct_rows": 5,
+      "customer_accuracy": 1.0,
+      "amount_accuracy": 1.0,
+      "date_accuracy": 1.0,
+      "type_accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "sample5": {
+      "total_ground_truth": 5,
+      "total_extracted": 5,
+      "matched_rows": 5,
+      "fully_correct_rows": 5,
+      "customer_accuracy": 1.0,
+      "amount_accuracy": 1.0,
+      "date_accuracy": 1.0,
+      "type_accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    }
+  },
+  "aggregate": {
+    "total_samples": 5,
+    "total_ground_truth_entries": 25,
+    "overall_row_detection_rate": 1.0,
+    "average_customer_accuracy": 1.0,
+    "average_amount_accuracy": 1.0,
+    "average_date_accuracy": 1.0,
+    "average_type_accuracy": 1.0,
+    "average_f1_score": 1.0
+  }
+}

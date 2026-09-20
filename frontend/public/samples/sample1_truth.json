@@ -1,0 +1,42 @@
+[
+  {
+    "customer": "Ramesh Kumar",
+    "amount": 850.0,
+    "date": "2026-09-12",
+    "type": "credit",
+    "confidence": 0.97,
+    "source_note": "Atta 10kg, Dal 2kg"
+  },
+  {
+    "customer": "Suresh Gupta",
+    "amount": 420.0,
+    "date": "2026-09-14",
+    "type": "credit",
+    "confidence": 0.95,
+    "source_note": "Chini 2kg, Chai Patti"
+  },
+  {
+    "customer": "Amit Verma",
+    "amount": 500.0,
+    "date": "2026-09-15",
+    "type": "payment",
+    "confidence": 0.94,
+    "source_note": "Jama kiya (cash returned)"
+  },
+  {
+    "customer": "Pooja Sharma",
+    "amount": 1250.0,
+    "date": "2026-09-16",
+    "type": "credit",
+    "confidence": 0.96,
+    "source_note": "Ghee 1kg, Masale packet"
+  },
+  {
+    "customer": "Rajesh Singh",
+    "amount": 630.0,
+    "date": "2026-09-18",
+    "type": "credit",
+    "confidence": 0.92,
+    "source_note": "Basmati Rice 5kg"
+  }
+]
