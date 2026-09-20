@@ -110,6 +110,12 @@ async def get_accuracy_benchmark():
     return {"status": "not_found"}
 
 
+# Mount production frontend build if present (serves single-port full stack)
+FRONTEND_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+if os.path.exists(FRONTEND_DIST):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.local_server:app", host="0.0.0.0", port=8000, reload=True)
