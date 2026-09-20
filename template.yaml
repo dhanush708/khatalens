@@ -1,0 +1,345 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  KhataLens - AI-powered handwritten credit ledger digitization for Indian shopkeepers.
+  Ship It track (First Commit | Bharat Builds Tour - WeMakeDevs x AWS Builder Center).
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        AWS_REGION_NAME: !Ref AWS::Region
+        UPLOAD_BUCKET_NAME: !Ref UploadBucket
+        DYNAMODB_TABLE_NAME: !Ref KhataLensTable
+        BEDROCK_MODEL_ID: !Ref BedrockModelId
+        DEMO_MODE: "false"
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - prod
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-3-5-sonnet-20240620-v1:0
+    Description: Vision-capable Amazon Bedrock model ID
+
+Resources:
+  ##############################################################################
+  # API GATEWAY (HTTP API)
+  ##############################################################################
+  KhataLensHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Amz-Date
+          - X-Api-Key
+          - X-Amz-Security-Token
+        AllowOrigins:
+          - "*"
+        MaxAge: 600
+
+  ##############################################################################
+  # DYNAMODB SINGLE TABLE
+  ##############################################################################
+  KhataLensTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "khatalens-entries-${Environment}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Project
+          Value: KhataLens
+        - Key: Event
+          Value: BharatBuildsTour
+
+  ##############################################################################
+  # S3 PRIVATE UPLOAD BUCKET
+  ##############################################################################
+  UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "khatalens-uploads-${AWS::AccountId}-${Environment}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireRawUploadsAfter30Days
+            Status: Enabled
+            ExpirationInDays: 30
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+            AllowedOrigins:
+              - "*"
+            MaxAge: 3600
+
+  ##############################################################################
+  # S3 STATIC WEBSITE HOSTING & CLOUDFRONT CDN
+  ##############################################################################
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "khatalens-frontend-${AWS::AccountId}-${Environment}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  CloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "KhataLens-OAC-${Environment}"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipalReadOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Comment: "KhataLens Frontend Distribution"
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt CloudFrontOriginAccessControl.Id
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 10
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 10
+
+  ##############################################################################
+  # LAMBDA FUNCTIONS
+  ##############################################################################
+  # 1. Presigned Upload URL Generator
+  UploadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src.handlers.upload.lambda_handler
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref UploadBucket
+      Events:
+        UploadUrlApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/upload-url
+            Method: post
+        UploadUrlOptions:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/upload-url
+            Method: options
+
+  # 2. Bedrock Converse API Vision Extractor
+  ExtractLedgerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src.handlers.extract.lambda_handler
+      Timeout: 60
+      MemorySize: 512
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref UploadBucket
+        - Statement:
+            - Sid: AllowBedrockInvokeModel
+              Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+      Events:
+        ExtractApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/extract
+            Method: post
+        ExtractOptions:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/extract
+            Method: options
+
+  # 3. Confirm & Commit Entries to DynamoDB
+  SaveEntriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src.handlers.entries.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref KhataLensTable
+      Events:
+        SaveEntriesApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/entries
+            Method: post
+        SaveEntriesOptions:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/entries
+            Method: options
+
+  # 4. Dues Dashboard & Aging Analytics
+  DashboardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src.handlers.dashboard.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref KhataLensTable
+      Events:
+        DashboardApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/dashboard
+            Method: get
+        DashboardOptions:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/dashboard
+            Method: options
+
+  # 5. Multilingual Polite Payment Reminder
+  ReminderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src.handlers.reminder_handler.lambda_handler
+      Policies:
+        - Statement:
+            - Sid: AllowBedrockPrompt
+              Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: "*"
+      Events:
+        ReminderApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/reminder
+            Method: post
+        ReminderOptions:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KhataLensHttpApi
+            Path: /api/reminder
+            Method: options
+
+Outputs:
+  HttpApiUrl:
+    Description: "Base URL of the Amazon API Gateway HTTP API"
+    Value: !Sub "https://${KhataLensHttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
+    Export:
+      Name: !Sub "${AWS::StackName}-HttpApiUrl"
+
+  UploadBucketName:
+    Description: "S3 Bucket for raw ledger uploads"
+    Value: !Ref UploadBucket
+
+  DynamoDBTableName:
+    Description: "DynamoDB Single Table Name"
+    Value: !Ref KhataLensTable
+
+  CloudFrontDistributionDomain:
+    Description: "Live Public CloudFront CDN URL for KhataLens Web Application"
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+
+  FrontendBucketName:
+    Description: "S3 Bucket for static React frontend hosting"
+    Value: !Ref FrontendBucket
