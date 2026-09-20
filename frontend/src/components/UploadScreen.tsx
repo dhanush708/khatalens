@@ -6,6 +6,7 @@ import type { ExtractionResponse } from '../types';
 interface UploadScreenProps {
   onExtractionComplete: (result: ExtractionResponse, imageUrl: string) => void;
   demoMode: boolean;
+  onLaunchAutoDemo?: () => void;
 }
 
 const SAMPLE_LEDGERS = [
@@ -53,7 +54,8 @@ const SAMPLE_LEDGERS = [
 
 export const UploadScreen: React.FC<UploadScreenProps> = ({
   onExtractionComplete,
-  demoMode
+  demoMode,
+  onLaunchAutoDemo
 }) => {
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -186,6 +188,18 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
           Take a photo of any handwritten Hindi/English credit notebook (*Bahi Khata*).
           Amazon Bedrock extracts the names, amounts, and dates so you never lose pending revenue.
         </p>
+
+        {onLaunchAutoDemo && (
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={onLaunchAutoDemo}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 text-white text-xs font-bold shadow-md shadow-orange-500/20 hover:brightness-110 active:scale-98 transition-all cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>🎬 Watch Self-Playing Narrated Demo (2:45)</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Upload Zone */}

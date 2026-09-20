@@ -1,9 +1,9 @@
 import React from 'react';
-import { BookOpen, Camera, CheckSquare, BarChart3, Award, Sparkles } from 'lucide-react';
+import { BookOpen, Camera, CheckSquare, BarChart3, Award, Sparkles, Film } from 'lucide-react';
 
 interface NavbarProps {
-  currentTab: 'upload' | 'review' | 'dashboard' | 'accuracy';
-  onTabChange: (tab: 'upload' | 'review' | 'dashboard' | 'accuracy') => void;
+  currentTab: 'upload' | 'review' | 'dashboard' | 'accuracy' | 'auto-demo';
+  onTabChange: (tab: 'upload' | 'review' | 'dashboard' | 'accuracy' | 'auto-demo') => void;
   demoMode: boolean;
   onToggleDemoMode: () => void;
   hasExtractedEntries: boolean;
@@ -90,8 +90,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right actions: Demo mode & AWS badge */}
+          {/* Right actions: Auto-Demo, Demo mode & AWS badge */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            <button
+              onClick={() => onTabChange('auto-demo')}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-orange-600 to-amber-500 text-white shadow-md shadow-orange-500/20 hover:brightness-110 active:scale-98 transition-all"
+              title="Launch self-playing narrated demo for video recording"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Auto-Demo</span>
+              <span className="sm:hidden">Demo</span>
+            </button>
+
             <button
               onClick={onToggleDemoMode}
               className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
@@ -102,7 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title={demoMode ? "Using bundled synthetic samples" : "Using live Amazon Bedrock"}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{demoMode ? "Demo Mode" : "AWS Live"}</span>
+              <span className="hidden sm:inline">{demoMode ? "Demo Mode" : "AWS Live"}</span>
             </button>
           </div>
         </div>

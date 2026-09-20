@@ -112,6 +112,15 @@ async def get_accuracy_benchmark():
 
 # Mount production frontend build if present (serves single-port full stack)
 FRONTEND_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+
+@app.get("/auto-demo")
+async def serve_auto_demo():
+    from fastapi.responses import FileResponse
+    index_path = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"error": "Frontend build not found"}
+
 if os.path.exists(FRONTEND_DIST):
     app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
 

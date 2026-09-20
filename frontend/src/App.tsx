@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { UploadScreen } from './components/UploadScreen';
 import { ReviewScreen } from './components/ReviewScreen';
 import { DashboardScreen } from './components/DashboardScreen';
 import { ReminderModal } from './components/ReminderModal';
 import { AccuracyPanel } from './components/AccuracyPanel';
+import { AutoDemo } from './components/AutoDemo/AutoDemo';
 import type { LedgerEntry, ExtractionResponse, CustomerBalance } from './types';
 
 export function App() {
-  const [currentTab, setCurrentTab] = useState<'upload' | 'review' | 'dashboard' | 'accuracy'>('upload');
+  const initialTab =
+    typeof window !== 'undefined' && (window.location.pathname.includes('/auto-demo') || window.location.search.includes('auto-demo'))
+      ? 'auto-demo'
+      : 'upload';
+
+  const [currentTab, setCurrentTab] = useState<'upload' | 'review' | 'dashboard' | 'accuracy' | 'auto-demo'>(initialTab);
   const [demoMode, setDemoMode] = useState<boolean>(true);
   
   // Extraction state
@@ -18,6 +24,15 @@ export function App() {
 
   // Reminder modal state
   const [activeCustomerForReminder, setActiveCustomerForReminder] = useState<CustomerBalance | null>(null);
+
+  // Synchronize URL path with tab state for seamless bookmarking/refreshing
+  useEffect(() => {
+    if (currentTab === 'auto-demo') {
+      window.history.replaceState(null, '', '/auto-demo');
+    } else {
+      window.history.replaceState(null, '', '/');
+    }
+  }, [currentTab]);
 
   const handleExtractionComplete = (result: ExtractionResponse, imageUrl: string) => {
     setExtractedEntries(result.entries);
@@ -30,6 +45,11 @@ export function App() {
     // Clear review entries and transition to dashboard
     setCurrentTab('dashboard');
   };
+
+  // Full-screen Auto-Demo View
+  if (currentTab === 'auto-demo') {
+    return <AutoDemo onExit={() => setCurrentTab('upload')} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -48,6 +68,7 @@ export function App() {
           <UploadScreen
             onExtractionComplete={handleExtractionComplete}
             demoMode={demoMode}
+            onLaunchAutoDemo={() => setCurrentTab('auto-demo')}
           />
         )}
 
@@ -87,9 +108,16 @@ export function App() {
           <p>
             <strong>KhataLens</strong> • First Commit | Bharat Builds Tour (WeMakeDevs x AWS Builder Center)
           </p>
-          <p className="text-[11px] text-slate-400">
-            Deployed on AWS: Amazon Bedrock • AWS Lambda • DynamoDB • S3 • CloudFront • API Gateway
-          </p>
+          <div className="flex items-center space-x-3 text-[11px] text-slate-400">
+            <button
+              onClick={() => setCurrentTab('auto-demo')}
+              className="text-orange-600 hover:underline font-semibold"
+            >
+              ▶ Play Auto-Demo
+            </button>
+            <span>•</span>
+            <span>AWS SAM Infrastructure as Code</span>
+          </div>
         </div>
       </footer>
     </div>
