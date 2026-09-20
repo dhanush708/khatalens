@@ -1,0 +1,42 @@
+[
+  {
+    "customer": "Mohd. Imran",
+    "amount": 650.0,
+    "date": "2026-09-08",
+    "type": "credit",
+    "confidence": 0.95,
+    "source_note": "2 Kurta Pyjama stitching"
+  },
+  {
+    "customer": "Vijay Tailor Work",
+    "amount": 400.0,
+    "date": "2026-09-10",
+    "type": "credit",
+    "confidence": 0.78,
+    "source_note": "Pant alteration - faint note"
+  },
+  {
+    "customer": "Lakshmi Amma",
+    "amount": 1100.0,
+    "date": "2026-09-11",
+    "type": "credit",
+    "confidence": 0.96,
+    "source_note": "3 Blouses with lining"
+  },
+  {
+    "customer": "Arun Kumar",
+    "amount": 500.0,
+    "date": "2026-09-13",
+    "type": "payment",
+    "confidence": 0.92,
+    "source_note": "Advance jama kiya"
+  },
+  {
+    "customer": "Shabana Begum",
+    "amount": 1850.0,
+    "date": "2026-09-17",
+    "type": "credit",
+    "confidence": 0.94,
+    "source_note": "Designer Anarkali suit work"
+  }
+]

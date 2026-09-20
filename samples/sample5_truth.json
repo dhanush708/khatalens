@@ -1,0 +1,42 @@
+[
+  {
+    "customer": "Harish Patel",
+    "amount": 2200.0,
+    "date": "2026-09-04",
+    "type": "credit",
+    "confidence": 0.96,
+    "source_note": "Paint bucket 20L primer"
+  },
+  {
+    "customer": "Babu Lal Mason",
+    "amount": 950.0,
+    "date": "2026-09-07",
+    "type": "payment",
+    "confidence": 0.93,
+    "source_note": "Settled & struck - jama full"
+  },
+  {
+    "customer": "Renu Verma",
+    "amount": 470.0,
+    "date": "2026-09-11",
+    "type": "credit",
+    "confidence": 0.82,
+    "source_note": "Pipe fittings & M-Seal tap"
+  },
+  {
+    "customer": "Manoj Singh",
+    "amount": 1650.0,
+    "date": "2026-09-15",
+    "type": "credit",
+    "confidence": 0.95,
+    "source_note": "Cement 3 bags white sand"
+  },
+  {
+    "customer": "Dinesh Chandra",
+    "amount": 800.0,
+    "date": "2026-09-18",
+    "type": "credit",
+    "confidence": 0.91,
+    "source_note": "Drill bits and screw box"
+  }
+]

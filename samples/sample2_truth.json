@@ -1,0 +1,42 @@
+[
+  {
+    "customer": "Anil Kumar (Dukan 4)",
+    "amount": 1400.0,
+    "date": "2026-09-15",
+    "type": "credit",
+    "confidence": 0.96,
+    "source_note": "Refined Oil 1 Tin udhaar"
+  },
+  {
+    "customer": "Sunil Auto Works",
+    "amount": 750.0,
+    "date": "2026-09-15",
+    "type": "credit",
+    "confidence": 0.94,
+    "source_note": "Soap, detergent, broom"
+  },
+  {
+    "customer": "Sunil Auto Works",
+    "amount": 750.0,
+    "date": "2026-09-16",
+    "type": "payment",
+    "confidence": 0.95,
+    "source_note": "GPay payment received"
+  },
+  {
+    "customer": "Deepak Medical",
+    "amount": 320.0,
+    "date": "2026-09-16",
+    "type": "credit",
+    "confidence": 0.91,
+    "source_note": "Biscuits & cold drinks"
+  },
+  {
+    "customer": "Kavita Rao",
+    "amount": 890.0,
+    "date": "2026-09-17",
+    "type": "credit",
+    "confidence": 0.93,
+    "source_note": "Shampoo, oil, toothpaste"
+  }
+]
